@@ -1,5 +1,6 @@
 import express from 'express';
 import type { ErrorRequestHandler, RequestHandler } from 'express';
+import cors from 'cors';
 import db from './config/database';
 import Activity from './models/Activity';
 import Leaderboard from './models/Leaderboard';
@@ -13,7 +14,13 @@ const codespaceName = process.env.CODESPACE_NAME;
 const baseUrl = codespaceName
   ? `https://${codespaceName}-8000.app.github.dev`
   : 'http://localhost:8000';
+const frontendOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  ...(codespaceName ? [`https://${codespaceName}-5173.app.github.dev`] : []),
+];
 
+app.use(cors({ origin: frontendOrigins }));
 app.use(express.json());
 
 function list(records: () => Promise<unknown>): RequestHandler {
